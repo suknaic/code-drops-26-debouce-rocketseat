@@ -5,26 +5,24 @@ const filterUsers = async (name) =>
     mode: "cors",
   }).then((res) => res.json());
 
-function debounceEvent() {
+function debounceEvent(fn, wait = 1000) {
   let time = null;
+  console.log("run debouce");
   // closure - padrao de projeto
-  return function (fn, wait = 1000) {
+  return function () {
     clearTimeout(time);
-
     time = setTimeout(() => {
-      fn();
+      fn.apply(this, arguments);
     }, wait);
   };
 }
 
-const debouce = debounceEvent();
-
 function handleKeyUp(event) {
-  debouce(() => {
-    filterUsers(event.target.value).then((users) =>
-      console.log(users.map((user) => user.name))
-    );
-  }, 2000);
+  filterUsers(event.target.value).then((users) =>
+    console.log(users.map((user) => user.name))
+  );
 }
 
-document.querySelector("input").addEventListener("keyup", handleKeyUp);
+document
+  .querySelector("input")
+  .addEventListener("keyup", debounceEvent(handleKeyUp, 300));
